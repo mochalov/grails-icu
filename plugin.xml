@@ -1,0 +1,10 @@
+<plugin name='icu' version='0.1' grailsVersion='2.4 &gt; *'>
+  <author>Andrey Mochalov</author>
+  <authorEmail>andrey.s.mochalov@gmail.com</authorEmail>
+  <title>ICU Support Plugin</title>
+  <description>Brief summary/description of the plugin.
+</description>
+  <documentation>http://grails.org/plugin/icu</documentation>
+  <type>IcuGrailsPlugin</type>
+  <resources />
+</plugin>

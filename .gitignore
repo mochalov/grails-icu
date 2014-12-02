@@ -1,0 +1,16 @@
+target
+
+# IDEA settings
+.idea/
+*.iml
+*.ids
+
+# IDEA Data Sources
+*.ids
+
+#MacOS
+.DS_Store
+
+#Sublime Text
+*.sublime-project
+*.sublime-workspace
