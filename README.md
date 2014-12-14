@@ -36,11 +36,11 @@ amount={0, spellout} dollars
 ```
 will output `twelve thousand forty-five dollars`.
 ### Other features
-ICU implements a more user-friendly apostrophe quoting syntax. In message text, an apostrophe only begins quoting
+- ICU implements a more user-friendly apostrophe quoting syntax. In message text, an apostrophe only begins quoting
 literal text if it immediately precedes a syntax character (mostly {curly braces}). By default an apostrophe always
 begins quoting, which requires common text like "don't" and "aujourd'hui" to be written with doubled apostrophes like "don''t" and "aujourd''hui".
-Many more date formats: month+day, year+month,...
-Date interval formats: "Dec 15-17, 2009"
+- Many more date formats: month+day, year+month,...
+- Date interval formats: "Dec 15-17, 2009"
 # License
 This plugin is available under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
 
