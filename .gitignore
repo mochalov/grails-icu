@@ -1,0 +1,16 @@
+target
+
+*.zip
+*.zip.sha1
+plugin.xml
+
+# IDEA settings
+.idea/
+*.iml
+*.ids
+
+# IDEA Data Sources
+*.ids
+
+#MacOS
+.DS_Store
