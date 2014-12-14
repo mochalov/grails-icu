@@ -33,7 +33,7 @@ class IcuGrailsPlugin extends I18nGrailsPlugin {
     def license = "APACHE"
 
     // Location of the plugin's issue tracker.
-//    def issueManagement = [ system: "JIRA", url: "http://jira.grails.org/browse/GPMYPLUGIN" ]
+    def issueManagement = [ url: "https://github.com/mochalov/grails-icu/issues" ]
 
     // Online location of the plugin's browseable source code.
 //    def scm = [ url: "http://svn.codehaus.org/grails-plugins/" ]
