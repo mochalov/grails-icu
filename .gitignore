@@ -4,6 +4,9 @@ target
 *.zip.sha1
 plugin.xml
 
+.classpath
+.project
+
 # IDEA settings
 .idea/
 *.iml
