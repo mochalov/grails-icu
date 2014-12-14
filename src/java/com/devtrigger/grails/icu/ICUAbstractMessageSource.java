@@ -1,22 +1,18 @@
 package com.devtrigger.grails.icu;
 
 import com.ibm.icu.text.MessageFormat;
-import org.springframework.context.HierarchicalMessageSource;
 import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceResolvable;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.util.ObjectUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * ICU4j MessageFormat aware {@link org.springframework.context.support.AbstractMessageSource} drop-in
  * @see com.ibm.icu.text.MessageFormat
  */
-public abstract class ICUAbstractMessageSource extends ICUMessageSourceSupport implements HierarchicalMessageSource {
+public abstract class ICUAbstractMessageSource extends ICUMessageSourceSupport implements ICUMessageSource {
 
     private MessageSource parentMessageSource;
 
@@ -88,6 +84,25 @@ public abstract class ICUAbstractMessageSource extends ICUMessageSourceSupport i
 
     @Override
     public final String getMessage(String code, Object[] args, String defaultMessage, Locale locale) {
+        return getMessage(code, new ICUListMessageArguments(args), defaultMessage, locale);
+    }
+
+    @Override
+    public final String getMessage(String code, Object[] args, Locale locale) throws NoSuchMessageException {
+        return getMessage(code, new ICUListMessageArguments(args), locale);
+    }
+
+    @Override
+    public final String getMessage(String code, Map<String, Object> args, String defaultMessage, Locale locale) {
+        return getMessage(code, new ICUMapMessageArguments(args), defaultMessage, locale);
+    }
+
+    @Override
+    public final String getMessage(String code, Map<String, Object> args, Locale locale) throws NoSuchMessageException {
+        return getMessage(code, new ICUMapMessageArguments(args), locale);
+    }
+
+    private String getMessage(String code, ICUMessageArguments args, String defaultMessage, Locale locale) {
         String msg = getMessageInternal(code, args, locale);
         if (msg != null) {
             return msg;
@@ -101,8 +116,7 @@ public abstract class ICUAbstractMessageSource extends ICUMessageSourceSupport i
         return renderDefaultMessage(defaultMessage, args, locale);
     }
 
-    @Override
-    public final String getMessage(String code, Object[] args, Locale locale) throws NoSuchMessageException {
+    private String getMessage(String code, ICUMessageArguments args, Locale locale) throws NoSuchMessageException {
         String msg = getMessageInternal(code, args, locale);
         if (msg != null) {
             return msg;
@@ -122,15 +136,16 @@ public abstract class ICUAbstractMessageSource extends ICUMessageSourceSupport i
         if (codes == null) {
             codes = new String[0];
         }
+        ICUMessageArguments args = new ICUListMessageArguments(resolvable.getArguments());
         for (String code : codes) {
-            String msg = getMessageInternal(code, resolvable.getArguments(), locale);
+            String msg = getMessageInternal(code, args, locale);
             if (msg != null) {
                 return msg;
             }
         }
         String defaultMessage = resolvable.getDefaultMessage();
         if (defaultMessage != null) {
-            return renderDefaultMessage(defaultMessage, resolvable.getArguments(), locale);
+            return renderDefaultMessage(defaultMessage, args, locale);
         }
         if (codes.length > 0) {
             String fallback = getDefaultMessage(codes[0]);
@@ -147,8 +162,7 @@ public abstract class ICUAbstractMessageSource extends ICUMessageSourceSupport i
      * returning {@code null} if not found. Does <i>not</i> fall back to
      * the code as default message. Invoked by {@code getMessage} methods.
      * @param code the code to lookup up, such as 'calculator.noRateSet'
-     * @param args array of arguments that will be filled in for params
-     * within the message
+     * @param args arguments that will be filled in for params within the message
      * @param locale the Locale in which to do the lookup
      * @return the resolved message, or {@code null} if not found
      * @see #getMessage(String, Object[], String, java.util.Locale)
@@ -156,16 +170,17 @@ public abstract class ICUAbstractMessageSource extends ICUMessageSourceSupport i
      * @see #getMessage(org.springframework.context.MessageSourceResolvable, java.util.Locale)
      * @see #setUseCodeAsDefaultMessage
      */
-    protected String getMessageInternal(String code, Object[] args, Locale locale) {
+    protected String getMessageInternal(String code, ICUMessageArguments args, Locale locale) {
         if (code == null) {
             return null;
         }
         if (locale == null) {
             locale = Locale.getDefault();
         }
-        Object[] argsToUse = args;
 
-        if (!isAlwaysUseMessageFormat() && ObjectUtils.isEmpty(args)) {
+        ICUMessageArguments argsToUse = args;
+
+        if (!isAlwaysUseMessageFormat() && args.isEmpty()) {
             // Optimized resolution: no arguments to apply,
             // therefore no MessageFormat needs to be involved.
             // Note that the default implementation still uses MessageFormat;
@@ -185,7 +200,7 @@ public abstract class ICUAbstractMessageSource extends ICUMessageSourceSupport i
             MessageFormat messageFormat = resolveCode(code, locale);
             if (messageFormat != null) {
                 synchronized (messageFormat) {
-                    return messageFormat.format(argsToUse);
+                    return argsToUse.formatWith(messageFormat);
                 }
             }
         }
@@ -206,13 +221,13 @@ public abstract class ICUAbstractMessageSource extends ICUMessageSourceSupport i
     /**
      * Try to retrieve the given message from the parent MessageSource, if any.
      * @param code the code to lookup up, such as 'calculator.noRateSet'
-     * @param args array of arguments that will be filled in for params
+     * @param args arguments that will be filled in for params
      * within the message
      * @param locale the Locale in which to do the lookup
      * @return the resolved message, or {@code null} if not found
      * @see #getParentMessageSource()
      */
-    protected String getMessageFromParent(String code, Object[] args, Locale locale) {
+    protected String getMessageFromParent(String code, ICUMessageArguments args, Locale locale) {
         MessageSource parent = getParentMessageSource();
         if (parent != null) {
             if (parent instanceof ICUAbstractMessageSource) {
@@ -221,8 +236,15 @@ public abstract class ICUAbstractMessageSource extends ICUMessageSourceSupport i
                 return ((ICUAbstractMessageSource) parent).getMessageInternal(code, args, locale);
             }
             else {
-                // Check parent MessageSource, returning null if not found there.
-                return parent.getMessage(code, args, null, locale);
+                if (args instanceof ICUListMessageArguments) {
+                    // Check parent MessageSource, returning null if not found there.
+                    ICUListMessageArguments listArgs = (ICUListMessageArguments)args;
+                    return parent.getMessage(code, listArgs.toArray(), null, locale);
+                } else {
+                    // returning a null because the parent is not an instance of ICUAbstractMessageSource and
+                    // therefore doesn't support arguments as map
+                    return null;
+                }
             }
         }
         // Not found in parent either.
@@ -248,28 +270,22 @@ public abstract class ICUAbstractMessageSource extends ICUMessageSourceSupport i
 
 
     /**
-     * Searches through the given array of objects, finds any MessageSourceResolvable
+     * Searches through the given arguments, finds any MessageSourceResolvable
      * objects and resolves them.
      * <p>Allows for messages to have MessageSourceResolvables as arguments.
-     * @param args array of arguments for a message
+     * @param args arguments for a message
      * @param locale the locale to resolve through
-     * @return an array of arguments with any MessageSourceResolvables resolved
      */
     @Override
-    protected Object[] resolveArguments(Object[] args, Locale locale) {
-        if (args == null) {
-            return new Object[0];
-        }
-        List<Object> resolvedArgs = new ArrayList<Object>(args.length);
-        for (Object arg : args) {
-            if (arg instanceof MessageSourceResolvable) {
-                resolvedArgs.add(getMessage((MessageSourceResolvable) arg, locale));
+    protected ICUMessageArguments resolveArguments(ICUMessageArguments args, final Locale locale) {
+        return args.transform(new ICUMessageArguments.Transformation() {
+            @Override
+            public Object transform(Object item) {
+                if (item instanceof MessageSourceResolvable)
+                    return getMessage((MessageSourceResolvable) item, locale);
+                return item;
             }
-            else {
-                resolvedArgs.add(arg);
-            }
-        }
-        return resolvedArgs.toArray(new Object[resolvedArgs.size()]);
+        });
     }
 
     /**

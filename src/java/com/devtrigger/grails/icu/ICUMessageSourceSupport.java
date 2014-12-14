@@ -66,13 +66,12 @@ public abstract class ICUMessageSourceSupport {
      * resolving any argument placeholders found in them. Subclasses may override
      * this method to plug in custom processing of default messages.
      * @param defaultMessage the passed-in default message String
-     * @param args array of arguments that will be filled in for params within
+     * @param args arguments that will be filled in for params within
      * the message, or {@code null} if none.
      * @param locale the Locale used for formatting
      * @return the rendered default message (with resolved arguments)
-     * @see #formatMessage(String, Object[], java.util.Locale)
      */
-    protected String renderDefaultMessage(String defaultMessage, Object[] args, Locale locale) {
+    protected String renderDefaultMessage(String defaultMessage, ICUMessageArguments args, Locale locale) {
         return formatMessage(defaultMessage, args, locale);
     }
 
@@ -81,13 +80,13 @@ public abstract class ICUMessageSourceSupport {
      * By default invoked for passed-in default messages, to resolve
      * any argument placeholders found in them.
      * @param msg the message to format
-     * @param args array of arguments that will be filled in for params within
+     * @param args arguments that will be filled in for params within
      * the message, or {@code null} if none
      * @param locale the Locale used for formatting
      * @return the formatted message (with resolved arguments)
      */
-    protected String formatMessage(String msg, Object[] args, Locale locale) {
-        if (msg == null || (!this.alwaysUseMessageFormat && ObjectUtils.isEmpty(args))) {
+    protected String formatMessage(String msg, ICUMessageArguments args, Locale locale) {
+        if (msg == null || (!this.alwaysUseMessageFormat && args.isEmpty())) {
             return msg;
         }
         MessageFormat messageFormat = null;
@@ -119,8 +118,9 @@ public abstract class ICUMessageSourceSupport {
         if (messageFormat == INVALID_MESSAGE_FORMAT) {
             return msg;
         }
+        resolveArguments(args, locale);
         synchronized (messageFormat) {
-            return messageFormat.format(resolveArguments(args, locale));
+            return args.formatWith(messageFormat);
         }
     }
 
@@ -138,12 +138,11 @@ public abstract class ICUMessageSourceSupport {
      * Template method for resolving argument objects.
      * <p>The default implementation simply returns the given argument array as-is.
      * Can be overridden in subclasses in order to resolve special argument types.
-     * @param args the original argument array
+     * @param args the original arguments
      * @param locale the Locale to resolve against
-     * @return the resolved argument array
+     * @return the resolved arguments
      */
-    protected Object[] resolveArguments(Object[] args, Locale locale) {
+    protected ICUMessageArguments resolveArguments(ICUMessageArguments args, Locale locale) {
         return args;
     }
-
 }

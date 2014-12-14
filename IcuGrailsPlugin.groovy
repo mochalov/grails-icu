@@ -19,14 +19,16 @@ class IcuGrailsPlugin extends I18nGrailsPlugin {
     ]
 
     def title = "ICU Support Plugin"
+
     def author = "Andrey Mochalov"
+
     def authorEmail = "andrey.s.mochalov@gmail.com"
-    def description = '''\
-Brief summary/description of the plugin.
-'''
+
+    def description = 'Provides the ICU4J\'s message formatting features, such as named arguments support, ' +
+            'flexible plural formatting, rule based number format, date interval formats, etc.'
 
     // URL to the plugin's documentation
-    def documentation = "http://grails.org/plugin/icu"
+    //def documentation = "http://grails.org/plugin/icu"
 
     def license = "APACHE"
 

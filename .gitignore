@@ -1,5 +1,9 @@
 target
 
+*.zip
+*.zip.sha1
+plugin.xml
+
 # IDEA settings
 .idea/
 *.iml
@@ -10,7 +14,3 @@ target
 
 #MacOS
 .DS_Store
-
-#Sublime Text
-*.sublime-project
-*.sublime-workspace
