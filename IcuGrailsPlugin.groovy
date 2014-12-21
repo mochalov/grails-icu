@@ -1,8 +1,8 @@
 import com.devtrigger.grails.icu.ICUPluginAwareResourceBundleMessageSource
 import com.devtrigger.grails.icu.ICUReloadableResourceBundleMessageSource
+import grails.util.Environment
 import org.apache.commons.logging.LogFactory
 import org.codehaus.groovy.grails.plugins.i18n.I18nGrailsPlugin
-import grails.util.Environment
 import org.codehaus.groovy.grails.web.context.GrailsConfigUtils
 import org.codehaus.groovy.grails.web.pages.GroovyPagesTemplateEngine
 
@@ -11,39 +11,23 @@ class IcuGrailsPlugin extends I18nGrailsPlugin {
     private static LOG = LogFactory.getLog(this)
 
     String version = "0.1"
-
     def grailsVersion = "2.4 > *"
-
-    def pluginExcludes = [
-        "grails-app/views/error.gsp"
-    ]
-
     def title = "ICU Support Plugin"
-
     def author = "Andrey Mochalov"
-
     def authorEmail = "andrey.s.mochalov@gmail.com"
-
-    def description = 'Provides the ICU4J\'s message formatting features, such as named arguments support, ' +
+    def description = "Provides the ICU4J's message formatting features, such as named arguments support, " +
             'flexible plural formatting, rule based number format, date interval formats, etc.'
-
-    // URL to the plugin's documentation
-    //def documentation = "http://grails.org/plugin/icu"
-
+    def documentation = "https://github.com/mochalov/grails-icu/blob/master/README.md"
     def license = "APACHE"
-
-    // Location of the plugin's issue tracker.
     def issueManagement = [ url: "https://github.com/mochalov/grails-icu/issues" ]
-
-    // Online location of the plugin's browseable source code.
-//    def scm = [ url: "http://svn.codehaus.org/grails-plugins/" ]
+    def scm = [ url: "https://github.com/mochalov/grails-icu/" ]
 
     def doWithSpring = { ctx ->
         Set baseNames = []
 
         def messageResources
         if (application.warDeployed) {
-            messageResources = parentCtx?.getResources("**/WEB-INF/${baseDir}/**/*.properties")?.toList()
+            messageResources = parentCtx?.getResources("**/WEB-INF/${baseDir}/**/*.properties") as List
         }
         else {
             messageResources = plugin.watchedResources
