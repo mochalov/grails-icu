@@ -3,7 +3,6 @@ package com.devtrigger.grails.icu;
 import com.ibm.icu.text.MessageFormat;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.util.ObjectUtils;
 
 import java.util.HashMap;
 import java.util.Locale;

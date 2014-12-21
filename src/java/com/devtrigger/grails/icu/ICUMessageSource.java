@@ -1,8 +1,6 @@
 package com.devtrigger.grails.icu;
 
 import org.springframework.context.HierarchicalMessageSource;
-import org.springframework.context.MessageSource;
-import org.springframework.context.MessageSourceResolvable;
 import org.springframework.context.NoSuchMessageException;
 
 import java.util.Locale;
