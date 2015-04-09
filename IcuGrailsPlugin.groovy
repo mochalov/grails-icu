@@ -10,7 +10,7 @@ class IcuGrailsPlugin extends I18nGrailsPlugin {
 
     private static LOG = LogFactory.getLog(this)
 
-    String version = "0.1"
+    String version = "0.1.1"
     def grailsVersion = "2.4 > *"
     def title = "ICU Support Plugin"
     def author = "Andrey Mochalov"
