@@ -30,7 +30,7 @@ class ICUValidationTaglibTagLib extends ValidationTagLib {
             if (!attrs.encodeAs && error instanceof MessageSourceResolvable) {
                 MessageSourceResolvable errorResolvable = (MessageSourceResolvable)error
                 if (errorResolvable.arguments) {
-                    error = new DefaultMessageSourceResolvable(errorResolvable.codes, encodeArgumentIfRequired(errorResolvable.arguments) as Object[], errorResolvable.defaultMessage)
+                    error = new DefaultMessageSourceResolvable(errorResolvable.codes, encodeArgumentsIfRequired(errorResolvable.arguments) as Object[], errorResolvable.defaultMessage)
                 }
             }
             try {
