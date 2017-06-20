@@ -1,11 +1,10 @@
 package com.devtrigger.grails.icu
 
 import groovy.transform.CompileStatic
-import org.codehaus.groovy.grails.plugins.web.taglib.FormatTagLib
-import org.codehaus.groovy.grails.plugins.web.taglib.ValidationTagLib
-import org.codehaus.groovy.grails.support.encoding.Encoder
-import org.codehaus.groovy.grails.web.taglib.GroovyPageAttributes
-import org.codehaus.groovy.grails.web.taglib.exceptions.GrailsTagException
+import org.grails.encoder.Encoder
+import org.grails.plugins.web.taglib.FormatTagLib
+import org.grails.plugins.web.taglib.ValidationTagLib
+import org.grails.taglib.GrailsTagException
 import org.springframework.context.MessageSourceResolvable
 import org.springframework.context.NoSuchMessageException
 import org.springframework.context.support.DefaultMessageSourceResolvable
@@ -22,7 +21,6 @@ class ICUValidationTaglibTagLib extends ValidationTagLib {
     @CompileStatic
     def messageImpl(Map attrs) {
         Locale locale = FormatTagLib.resolveLocale(attrs.locale)
-        def tagSyntaxCall = (attrs instanceof GroovyPageAttributes) ? attrs.isGspTagSyntaxCall() : false
 
         def text
         Object error = attrs.error ?: attrs.message
@@ -35,7 +33,7 @@ class ICUValidationTaglibTagLib extends ValidationTagLib {
             }
             try {
                 if (error instanceof MessageSourceResolvable) {
-                    text = messageSource.getMessage(error, locale)
+                    text = messageSource.getMessage((MessageSourceResolvable)error, locale)
                 } else {
                     text = messageSource.getMessage(error.toString(), null, locale)
                 }

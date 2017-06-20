@@ -4,6 +4,7 @@ import com.ibm.icu.text.MessageFormat;
 import grails.util.CacheEntry;
 import grails.util.Pair;
 import org.springframework.context.ResourceLoaderAware;
+import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -24,12 +25,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * ICU4j MessageFormat aware {@link org.codehaus.groovy.grails.context.support.ReloadableResourceBundleMessageSource}
+ * ICU4j MessageFormat aware {@link org.springframework.context.support.ReloadableResourceBundleMessageSource}
  * drop-in
  * @see com.ibm.icu.text.MessageFormat
  */
 public class ICUReloadableResourceBundleMessageSource extends ICUAbstractMessageSource
         implements ResourceLoaderAware {
+
 
     private static final String PROPERTIES_SUFFIX = ".properties";
 
@@ -57,10 +59,10 @@ public class ICUReloadableResourceBundleMessageSource extends ICUAbstractMessage
             new ConcurrentHashMap<Pair<String, Locale>, CacheEntry<List<Pair<String, Resource>>>>();
 
     /** Cache to hold already loaded properties per filename */
-    private final ConcurrentMap<String, CacheEntry<PropertiesHolder>> cachedProperties = new ConcurrentHashMap<String, CacheEntry<PropertiesHolder>>();
+    private final ConcurrentMap<String, CacheEntry<ICUReloadableResourceBundleMessageSource.PropertiesHolder>> cachedProperties = new ConcurrentHashMap<String, CacheEntry<ICUReloadableResourceBundleMessageSource.PropertiesHolder>>();
 
     /** Cache to hold merged loaded properties per locale */
-    private final ConcurrentMap<Locale, CacheEntry<PropertiesHolder>> cachedMergedProperties = new ConcurrentHashMap<Locale, CacheEntry<PropertiesHolder>>();
+    private final ConcurrentMap<Locale, CacheEntry<ICUReloadableResourceBundleMessageSource.PropertiesHolder>> cachedMergedProperties = new ConcurrentHashMap<Locale, CacheEntry<ICUReloadableResourceBundleMessageSource.PropertiesHolder>>();
 
     private final ConcurrentMap<String, CacheEntry<Resource>> cachedResources = new ConcurrentHashMap<String, CacheEntry<Resource>>();
 
@@ -68,7 +70,7 @@ public class ICUReloadableResourceBundleMessageSource extends ICUAbstractMessage
     /**
      * Set a single basename, following the basic ResourceBundle convention of
      * not specifying file extension or language codes, but in contrast to
-     * {@link org.springframework.context.support.ResourceBundleMessageSource} referring to a Spring resource location:
+     * {@link ResourceBundleMessageSource} referring to a Spring resource location:
      * e.g. "WEB-INF/messages" for "WEB-INF/messages.properties",
      * "WEB-INF/messages_en.properties", etc.
      * <p>XML properties files are also supported: .g. "WEB-INF/messages" will find
@@ -85,7 +87,7 @@ public class ICUReloadableResourceBundleMessageSource extends ICUAbstractMessage
     /**
      * Set an array of basenames, each following the basic ResourceBundle convention
      * of not specifying file extension or language codes, but in contrast to
-     * {@link org.springframework.context.support.ResourceBundleMessageSource} referring to a Spring resource location:
+     * {@link ResourceBundleMessageSource} referring to a Spring resource location:
      * e.g. "WEB-INF/messages" for "WEB-INF/messages.properties",
      * "WEB-INF/messages_en.properties", etc.
      * <p>XML properties files are also supported: .g. "WEB-INF/messages" will find
@@ -219,7 +221,7 @@ public class ICUReloadableResourceBundleMessageSource extends ICUAbstractMessage
     @Override
     protected String resolveCodeWithoutArguments(String code, Locale locale) {
         if (this.cacheMillis < 0) {
-            PropertiesHolder propHolder = getMergedProperties(locale);
+            ICUReloadableResourceBundleMessageSource.PropertiesHolder propHolder = getMergedProperties(locale);
             String result = propHolder.getProperty(code);
             if (result != null) {
                 return result;
@@ -230,7 +232,7 @@ public class ICUReloadableResourceBundleMessageSource extends ICUAbstractMessage
                 List<Pair<String, Resource>> filenamesAndResources = calculateAllFilenames(basename, locale);
                 for (Pair<String, Resource> filenameAndResource : filenamesAndResources) {
                     if(filenameAndResource.getbValue() != null) {
-                        PropertiesHolder propHolder = getProperties(filenameAndResource.getaValue(), filenameAndResource.getbValue());
+                        ICUReloadableResourceBundleMessageSource.PropertiesHolder propHolder = getProperties(filenameAndResource.getaValue(), filenameAndResource.getbValue());
                         String result = propHolder.getProperty(code);
                         if (result != null) {
                             return result;
@@ -249,7 +251,7 @@ public class ICUReloadableResourceBundleMessageSource extends ICUAbstractMessage
     @Override
     protected MessageFormat resolveCode(String code, Locale locale) {
         if (this.cacheMillis < 0) {
-            PropertiesHolder propHolder = getMergedProperties(locale);
+            ICUReloadableResourceBundleMessageSource.PropertiesHolder propHolder = getMergedProperties(locale);
             MessageFormat result = propHolder.getMessageFormat(code, locale);
             if (result != null) {
                 return result;
@@ -260,7 +262,7 @@ public class ICUReloadableResourceBundleMessageSource extends ICUAbstractMessage
                 List<Pair<String, Resource>> filenamesAndResources = calculateAllFilenames(basename, locale);
                 for (Pair<String, Resource> filenameAndResource : filenamesAndResources) {
                     if(filenameAndResource.getbValue() != null) {
-                        PropertiesHolder propHolder = getProperties(filenameAndResource.getaValue(), filenameAndResource.getbValue());
+                        ICUReloadableResourceBundleMessageSource.PropertiesHolder propHolder = getProperties(filenameAndResource.getaValue(), filenameAndResource.getbValue());
                         MessageFormat result = propHolder.getMessageFormat(code, locale);
                         if (result != null) {
                             return result;
@@ -281,18 +283,18 @@ public class ICUReloadableResourceBundleMessageSource extends ICUAbstractMessage
      * with cacheSeconds < 0. Therefore, merged properties are always
      * cached forever.
      */
-    protected PropertiesHolder getMergedProperties(final Locale locale) {
-        return CacheEntry.getValue(cachedMergedProperties, locale, cacheMillis, new Callable<PropertiesHolder>() {
+    protected ICUReloadableResourceBundleMessageSource.PropertiesHolder getMergedProperties(final Locale locale) {
+        return CacheEntry.getValue(cachedMergedProperties, locale, cacheMillis, new Callable<ICUReloadableResourceBundleMessageSource.PropertiesHolder>() {
             @Override
-            public PropertiesHolder call() throws Exception {
+            public ICUReloadableResourceBundleMessageSource.PropertiesHolder call() throws Exception {
                 Properties mergedProps = new Properties();
-                PropertiesHolder mergedHolder = new PropertiesHolder(mergedProps);
+                ICUReloadableResourceBundleMessageSource.PropertiesHolder mergedHolder = new ICUReloadableResourceBundleMessageSource.PropertiesHolder(mergedProps);
                 for (int i = basenames.length - 1; i >= 0; i--) {
                     List<Pair<String, Resource>> filenamesAndResources = calculateAllFilenames(basenames[i], locale);
                     for (int j = filenamesAndResources.size() - 1; j >= 0; j--) {
                         Pair<String, Resource> filenameAndResource = filenamesAndResources.get(j);
-                        if (filenameAndResource.getbValue() != null) {
-                            PropertiesHolder propHolder = getProperties(filenameAndResource.getaValue(), filenameAndResource.getbValue());
+                        if(filenameAndResource.getbValue() != null) {
+                            ICUReloadableResourceBundleMessageSource.PropertiesHolder propHolder = getProperties(filenameAndResource.getaValue(), filenameAndResource.getbValue());
                             mergedProps.putAll(propHolder.getProperties());
                         }
                     }
@@ -329,8 +331,8 @@ public class ICUReloadableResourceBundleMessageSource extends ICUAbstractMessage
                     }
                 }
                 filenames.add(basename);
-                List<Pair<String, Resource>> filenamesAndResources = new ArrayList<Pair<String, Resource>>(filenames.size());
-                for (String filename : filenames) {
+                List<Pair<String, Resource>> filenamesAndResources = new ArrayList<Pair<String,Resource>>(filenames.size());
+                for(String filename : filenames) {
                     filenamesAndResources.add(new Pair<String, Resource>(filename, locateResource(filename)));
                 }
                 return filenamesAndResources;
@@ -383,27 +385,27 @@ public class ICUReloadableResourceBundleMessageSource extends ICUAbstractMessage
      * @return the current PropertiesHolder for the bundle
      */
     @SuppressWarnings("rawtypes")
-    protected PropertiesHolder getProperties(final String filename, final Resource resource) {
-        return CacheEntry.getValue(cachedProperties, filename, fileCacheMillis, new Callable<PropertiesHolder>() {
+    protected ICUReloadableResourceBundleMessageSource.PropertiesHolder getProperties(final String filename, final Resource resource) {
+        return CacheEntry.getValue(cachedProperties, filename, fileCacheMillis, new Callable<ICUReloadableResourceBundleMessageSource.PropertiesHolder>() {
             @Override
-            public PropertiesHolder call() throws Exception {
-                return new PropertiesHolder(filename, resource);
+            public ICUReloadableResourceBundleMessageSource.PropertiesHolder call() throws Exception {
+                return new ICUReloadableResourceBundleMessageSource.PropertiesHolder(filename, resource);
             }
         }, new Callable<CacheEntry>() {
             @Override
             public CacheEntry call() throws Exception {
-                return new PropertiesHolderCacheEntry();
+                return new ICUReloadableResourceBundleMessageSource.PropertiesHolderCacheEntry();
             }
         }, true, null);
     }
 
-    protected static class PropertiesHolderCacheEntry extends CacheEntry<PropertiesHolder> {
+    protected static class PropertiesHolderCacheEntry extends CacheEntry<ICUReloadableResourceBundleMessageSource.PropertiesHolder> {
         public PropertiesHolderCacheEntry() {
             super();
         }
 
         @Override
-        protected PropertiesHolder updateValue(PropertiesHolder oldValue, Callable<PropertiesHolder> updater, Object cacheRequestObject)
+        protected ICUReloadableResourceBundleMessageSource.PropertiesHolder updateValue(ICUReloadableResourceBundleMessageSource.PropertiesHolder oldValue, Callable<ICUReloadableResourceBundleMessageSource.PropertiesHolder> updater, Object cacheRequestObject)
                 throws Exception {
             if(oldValue != null) {
                 oldValue.update();
@@ -419,7 +421,7 @@ public class ICUReloadableResourceBundleMessageSource extends ICUAbstractMessage
      * @param resource the resource to load from
      * @param filename the original bundle filename (basename + Locale)
      * @return the populated Properties instance
-     * @throws java.io.IOException if properties loading failed
+     * @throws IOException if properties loading failed
      */
     protected Properties loadProperties(Resource resource, String filename) throws IOException {
         InputStream is = resource.getInputStream();
@@ -480,8 +482,8 @@ public class ICUReloadableResourceBundleMessageSource extends ICUAbstractMessage
         clearCache();
         if (getParentMessageSource() instanceof ICUReloadableResourceBundleMessageSource) {
             ((ICUReloadableResourceBundleMessageSource) getParentMessageSource()).clearCacheIncludingAncestors();
-        } else if (getParentMessageSource() instanceof org.springframework.context.support.ReloadableResourceBundleMessageSource) {
-            ((org.springframework.context.support.ReloadableResourceBundleMessageSource) getParentMessageSource()).clearCacheIncludingAncestors();
+        } else if (getParentMessageSource() instanceof ICUReloadableResourceBundleMessageSource) {
+            ((ICUReloadableResourceBundleMessageSource) getParentMessageSource()).clearCacheIncludingAncestors();
         }
     }
 
@@ -500,7 +502,10 @@ public class ICUReloadableResourceBundleMessageSource extends ICUAbstractMessage
     }
 
     protected Resource locateResourceWithoutCache(String filename) {
-        Resource resource = resourceLoader.getResource(filename + PROPERTIES_SUFFIX);
+        Resource resource = resourceLoader.getResource(org.grails.io.support.ResourceLoader.CLASSPATH_URL_PREFIX + filename + PROPERTIES_SUFFIX);
+        if(!resource.exists()) {
+            resource = resourceLoader.getResource(filename + PROPERTIES_SUFFIX);
+        }
         if (!resource.exists()) {
             resource = resourceLoader.getResource(filename + XML_SUFFIX);
         }

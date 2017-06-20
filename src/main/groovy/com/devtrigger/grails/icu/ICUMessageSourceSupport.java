@@ -3,6 +3,7 @@ package com.devtrigger.grails.icu;
 import com.ibm.icu.text.MessageFormat;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.util.ObjectUtils;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -85,7 +86,7 @@ public abstract class ICUMessageSourceSupport {
      * @return the formatted message (with resolved arguments)
      */
     protected String formatMessage(String msg, ICUMessageArguments args, Locale locale) {
-        if (msg == null || (!this.alwaysUseMessageFormat && args.isEmpty())) {
+        if (msg == null || (!isAlwaysUseMessageFormat() && ObjectUtils.isEmpty(args))) {
             return msg;
         }
         MessageFormat messageFormat = null;
@@ -95,7 +96,7 @@ public abstract class ICUMessageSourceSupport {
                 messageFormat = messageFormatsPerLocale.get(locale);
             }
             else {
-                messageFormatsPerLocale = new HashMap<Locale, MessageFormat>();
+                messageFormatsPerLocale = new HashMap<>();
                 this.messageFormatsPerMessage.put(msg, messageFormatsPerLocale);
             }
             if (messageFormat == null) {
@@ -103,12 +104,12 @@ public abstract class ICUMessageSourceSupport {
                     messageFormat = createMessageFormat(msg, locale);
                 }
                 catch (IllegalArgumentException ex) {
-                    // invalid message format - probably not intended for formatting,
-                    // rather using a message structure with no arguments involved
-                    if (this.alwaysUseMessageFormat) {
+                    // Invalid message format - probably not intended for formatting,
+                    // rather using a message structure with no arguments involved...
+                    if (isAlwaysUseMessageFormat()) {
                         throw ex;
                     }
-                    // silently proceed with raw message if format not enforced
+                    // Silently proceed with raw message if format not enforced...
                     messageFormat = INVALID_MESSAGE_FORMAT;
                 }
                 messageFormatsPerLocale.put(locale, messageFormat);
