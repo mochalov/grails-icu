@@ -5,19 +5,17 @@ buildscript {
     }
     dependencies {
         classpath "org.grails:grails-gradle-plugin:$grailsVersion"
-        classpath "com.bertramlabs.plugins:asset-pipeline-gradle:2.8.2"
     }
 }
 
-version "0.1"
-group "grails.icu"
+version "1.0"
+group "org.grails.plugins"
 
 apply plugin:"eclipse"
 apply plugin:"idea"
 apply plugin:"org.grails.grails-plugin"
 apply plugin:"org.grails.grails-plugin-publish"
 apply plugin:"org.grails.grails-gsp"
-apply plugin:"asset-pipeline"
 
 repositories {
     mavenLocal()
@@ -57,8 +55,6 @@ bootRun {
     jvmArgs('-Dspring.output.ansi.enabled=always')
 }
 
-// enable if you wish to package this plugin as a standalone application
-bootRepackage.enabled = false
 grailsPublish {
     // TODO: Provide values here
     user = 'user'
@@ -74,8 +70,3 @@ grailsPublish {
     portalPassword = ""    
 }
 
-
-
-assets {
-    packagePlugin = true
-}

@@ -1,4 +1,4 @@
-package com.devtrigger.grails.icu;
+package org.grails.plugins.icu;
 
 import org.springframework.context.HierarchicalMessageSource;
 import org.springframework.context.NoSuchMessageException;

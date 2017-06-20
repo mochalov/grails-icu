@@ -1,4 +1,4 @@
-package com.devtrigger.grails.icu
+package org.grails.plugins.icu
 
 import groovy.transform.CompileStatic
 import org.grails.encoder.Encoder

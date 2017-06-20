@@ -1,4 +1,4 @@
-package com.devtrigger.grails.icu;
+package org.grails.plugins.icu;
 
 import com.ibm.icu.text.MessageFormat;
 import grails.core.DefaultGrailsApplication;

@@ -1,4 +1,4 @@
-package com.devtrigger.grails.icu
+package org.grails.plugins.icu
 
 import grails.config.Config
 import grails.config.Settings
@@ -92,19 +92,8 @@ class ICUGrailsPlugin extends I18nGrailsPlugin {
         }
 
         def messageSource = ctx.getBean('messageSource')
-        if (messageSource instanceof ReloadableResourceBundleMessageSource) {
+        if (messageSource instanceof ICUReloadableResourceBundleMessageSource) {
             messageSource.clearCache()
         }
-    }
-
-    protected boolean isChildOfFile(File child, File parent) {
-        def currentFile = child.canonicalFile
-        while(currentFile != null) {
-            if (currentFile == parent) {
-                return true
-            }
-            currentFile = currentFile.parentFile
-        }
-        return false
     }
 }
