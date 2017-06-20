@@ -13,9 +13,9 @@ import org.springframework.context.support.DefaultMessageSourceResolvable
  * Provides additional features to the g:message tag, such as
  * an ability to pass a map as message arguments
  */
-class ICUValidationTaglibTagLib extends ValidationTagLib {
+class ICUValidationTagLib extends ValidationTagLib {
 
-    static returnObjectForTags = ['message']
+    static returnObjectForTags = ['message', 'fieldError', 'formatValue']
 
     @Override
     @CompileStatic
@@ -109,5 +109,4 @@ class ICUValidationTaglibTagLib extends ValidationTagLib {
             encoder ? encoder.encode(value) : value
         }
     }
-
 }

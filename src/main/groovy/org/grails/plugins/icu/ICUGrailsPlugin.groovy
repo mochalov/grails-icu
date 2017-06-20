@@ -17,7 +17,7 @@ class ICUGrailsPlugin extends I18nGrailsPlugin {
 
     String version = "0.1.1"
     def grailsVersion = "3.2 > *"
-    def title = "ICU Support Plugin"
+    def title = "Grails ICU Support Plugin"
     def author = "Andrey Mochalov"
     def authorEmail = "andrey.s.mochalov@gmail.com"
     def description = "Provides the ICU4J's message formatting features, such as named arguments support, " +
@@ -26,7 +26,9 @@ class ICUGrailsPlugin extends I18nGrailsPlugin {
     def license = "APACHE"
     def issueManagement = [ url: "https://github.com/mochalov/grails-icu/issues" ]
     def scm = [ url: "https://github.com/mochalov/grails-icu/" ]
-
+    
+    List loadAfter = ['grails-plugin-gsp']
+    
     @Override
     Closure doWithSpring() {{->
         GrailsApplication application = grailsApplication
