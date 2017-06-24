@@ -3,6 +3,23 @@
 Provides the [ICU4J](http://site.icu-project.org/) message formatting features, such as named arguments support, flexible plural formatting,
 rule based number format, date interval formats.
 
+## Installation
+Please add the following repository to your repository list: 
+```groovy
+repositories {
+    //..
+    maven { url "https://dl.bintray.com/tkvw/plugins" }
+    // ..
+}
+```
+And add the following dependency to the dependencies section of build.gradle
+```groovy
+dependencies {
+    // .. 
+    compile 'org.grails.plugins:icu:1.0'
+}
+```
+
 ## Features
 ### Named arguments
 By default Grails allows to use only numbered arguments in i18n messages. The plugin allows to use also named arguments,

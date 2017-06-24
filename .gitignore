@@ -1,9 +1,9 @@
 target
-
+build
 *.zip
 *.zip.sha1
 plugin.xml
-
+.gradle
 .classpath
 .project
 
