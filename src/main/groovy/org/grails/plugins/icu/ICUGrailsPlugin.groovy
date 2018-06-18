@@ -15,8 +15,8 @@ class ICUGrailsPlugin extends I18nGrailsPlugin {
 
     private static LOG = LogFactory.getLog(this)
 
-    String version = "0.1.1"
-    def grailsVersion = "3.2 > *"
+    String version = "1.0.1"
+    def grailsVersion = "3.3.5 > *"
     def title = "Grails ICU Support Plugin"
     def author = "Andrey Mochalov"
     def authorEmail = "andrey.s.mochalov@gmail.com"
@@ -26,9 +26,9 @@ class ICUGrailsPlugin extends I18nGrailsPlugin {
     def license = "APACHE"
     def issueManagement = [ url: "https://github.com/mochalov/grails-icu/issues" ]
     def scm = [ url: "https://github.com/mochalov/grails-icu/" ]
-    
+
     List loadAfter = ['grails-plugin-gsp']
-    
+
     @Override
     Closure doWithSpring() {{->
         GrailsApplication application = grailsApplication
@@ -39,8 +39,8 @@ class ICUGrailsPlugin extends I18nGrailsPlugin {
         messageSource(ICUPluginAwareResourceBundleMessageSource, application, pluginManager) {
             fallbackToSystemLocale = false
             if (Environment.current.isReloadEnabled() || gspEnableReload) {
-                cacheSeconds = config.getProperty(I18N_CACHE_SECONDS, Integer, 5)
-                fileCacheSeconds = config.getProperty(I18N_FILE_CACHE_SECONDS, Integer, 5)
+                cacheSeconds = config.getProperty(Settings.I18N_CACHE_SECONDS, Integer, 5)
+                fileCacheSeconds = config.getProperty(Settings.I18N_FILE_CACHE_SECONDS, Integer, 5)
             }
             defaultEncoding = encoding
         }
